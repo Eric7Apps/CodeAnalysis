@@ -18,19 +18,7 @@
 // Identifiers:
 // https://docs.microsoft.com/en-us/cpp/cpp/identifiers-cpp
 
-
-// "A C++ identifier is a name used to identify a
-// variable, function, class, module, or any other
-// user-defined item. An identifier starts with a
-// letter A to Z or a to z or an underscore (_)
-// followed by zero or more letters, underscores,
-// and digits (0 to 9).
-
-// Like some formal Regular Expression for where
-// an identifier ends.
-
 // https://docs.microsoft.com/en-us/cpp/cpp/identifiers-cpp
-
 
 // https://en.wikipedia.org/wiki/C_preprocessor
 
@@ -53,12 +41,13 @@ namespace CodeAnalysis
   private string LocalIncludeDirectory = "";
   private SourceFileToken[] TokenArray;
   private int TokenArrayLast = 0;
+  private PreProcessor PreProc;
 
   // I am using what are called the "Dingbat"
   // characters as markers or delimiters.
   private const char SlashStarDingbat = (char)0x2700;
   private const char StarSlashDingbat = (char)0x2701;
-    // const char DoubleSlashDingbat = (char)0x2702;
+  private const char DoubleSlashDingbat = (char)0x2702;
   private const char EscapedQuoteDingbat = (char)0x2703;
 
 
@@ -70,10 +59,13 @@ namespace CodeAnalysis
 
 
   internal SourceFile( MainForm UseForm,
-                       string UseFileName )
+                       string UseFileName,
+                       PreProcessor UsePreProc )
     {
     MForm = UseForm;
     FileName = UseFileName;
+    PreProc = UsePreProc;
+
     // If the included file has quotes around it.
     LocalIncludeDirectory =
               Path.GetDirectoryName( FileName );
@@ -82,14 +74,6 @@ namespace CodeAnalysis
 
     ShowStatus( "LocalIncludeDirectory: " +
                               LocalIncludeDirectory );
-
-
-    // "If the filename is enclosed within angle
-    // brackets, the file is searched for in the
-    // standard compiler include paths. If the
-    // filename is enclosed within double quotes,
-    // the search path is expanded to include the
-    // current source directory."
 
 
     // File.GetAttributes()
@@ -103,7 +87,6 @@ namespace CodeAnalysis
 
     MainSArray = new StringArray( MForm );
     TokenArray = new SourceFileToken[2];
-
     }
 
 
@@ -271,17 +254,6 @@ namespace CodeAnalysis
       {
       char ToCheck = InString[Count];
 
-      /*
-      if( ToCheck == '\r' )
-        ToCheck == ' ';
-
-      if( ToCheck == '\n' )
-        ToCheck == ' ';
-
-      if( ToCheck == '\t' )
-        ToCheck == ' ';
-      */
-
       // Get rid of control characters.
       if( ToCheck < ' ' )
         ToCheck = ' ';
@@ -360,8 +332,6 @@ namespace CodeAnalysis
           continue;
           }
 
-        // DoubleSlashDingbat
-
         if( !IsInsideComment )
           SBuilder.Append( Char.ToString( OneChar ));
 
@@ -404,27 +374,45 @@ namespace CodeAnalysis
 
       string DoubleSlash = "/" + "/";
       if( Line.Contains( DoubleSlash ))
-        throw( new Exception( "They used a double slash here:\r\n" + Line ));
-        // So remove those comments.
-        // Line = Line.Replace( DoubleSlash, Char.ToString( DoubleSlashDingbat ));
+        Line = RemoveDoubleSlashComments( Line );
 
-      // Or use \n to be compatible with Linux.
-      SBuilder.Append( Line.TrimEnd() + "\r" );
+      // Using \n to be compatible with Linux.
+      SBuilder.Append( Line.TrimEnd() + "\n" );
       }
 
     string FileS = SBuilder.ToString();
-    FileS = FileS.Replace( "\\\r", " " );
+    FileS = FileS.Replace( "\\\n", " " );
 
     // Remove the beginning and ending white space.
     FileS = FileS.Trim();
 
     MainSArray.Clear();
-    string[] FileLines = FileS.Split( new Char[] { '\r' } );
+    string[] FileLines = FileS.Split( new Char[] { '\n' } );
 
     Last = FileLines.Length;
     for( int Count = 0; Count < Last; Count++ )
       MainSArray.AppendStringToArray( FileLines[Count] );
 
+    }
+
+
+
+  private string RemoveDoubleSlashComments( string Line )
+    {
+    string DoubleSlash = "/" + "/";
+    Line = Line.Replace( DoubleSlash, Char.ToString( DoubleSlashDingbat ));
+    StringBuilder SBuilder = new StringBuilder();
+    int LineLength = Line.Length;
+    for( int Count = 0; Count < LineLength; Count++ )
+      {
+      char OneChar = Line[Count];
+      if( OneChar == DoubleSlashDingbat )
+        break;
+
+      SBuilder.Append( Char.ToString( OneChar ));
+      }
+
+    return SBuilder.ToString();
     }
 
 
@@ -457,7 +445,8 @@ namespace CodeAnalysis
 
       if( IsPreprocessorLine( Line ))
         {
-        // ShowStatus( "Preprocessor: " + Line );
+        PreProc.ParseLine( Line );
+
         Token.Text = Line.Trim();
         Token.TokenType = SourceFileToken.
                      EnumTokenType.PreProcessor;
@@ -471,6 +460,32 @@ namespace CodeAnalysis
       MakeTokensFromLine( Line );
       }
     }
+
+
+/*
+
+Token.Comment = "Something";
+
+======
+  private string MarkPreprocessorLine( string Line )
+    {
+    // #ifndef USED_FOR_TARGET
+    // #undef uintmax_t
+    // #endif
+
+    // #if defined(DBX_DEBUGGING_INFO) || defined(XCOFF_DEBUGGING_INFO)
+
+    // #ifdef XCOFF_DEBUGGING_INFO
+
+    // #ifdef HAVE_isl
+
+    // #ifndef GCC_SYSTEM_H
+    // #define GCC_SYSTEM_H
+
+    // #include "config.h"
+
+    }
+*/
 
 
 
@@ -626,7 +641,7 @@ namespace CodeAnalysis
     // There can only be one preprocessor statement
     // per line.
 
-    // Line = Line.Trim();
+    Line = Line.Trim();
     if( Line.StartsWith( "#" ))
       return true;
 
