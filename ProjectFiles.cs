@@ -8,9 +8,6 @@
 
 
 // https://en.wikipedia.org/wiki/C_preprocessor
-// "Line splicing: Physical source lines that are
-// continued with escaped newline sequences are
-// spliced to form logical lines."
 
 
 using System;
@@ -101,6 +98,9 @@ namespace CodeAnalysis
       if( FileNameLower.EndsWith( ".mk" ))
         continue;
 
+// If I exclude every known file extension, then
+// what's left?
+
       // https://en.wikipedia.org/wiki/M4_(computer_language)
       // https://en.wikipedia.org/wiki/Autoconf
       // Macro processor files:
@@ -123,7 +123,6 @@ namespace CodeAnalysis
         continue;
         }
 
-
       // string ShortName = FileName.Replace( MForm.GetWebPagesDirectory(), "" );
       // ShowStatus( FileName );
 
@@ -137,7 +136,6 @@ namespace CodeAnalysis
         return;
 
       }
-
 
     string [] SubDirEntries = Directory.GetDirectories( DirName );
     foreach( string SubDir in SubDirEntries )
@@ -153,7 +151,6 @@ namespace CodeAnalysis
 
       if( SubDir.StartsWith( ProjectDirectory + "libstdc++-v3\\testsuite\\" ))
         continue;
-
 
       // Call itself recursively.
       SearchOneDirectory( SubDir );
@@ -200,8 +197,6 @@ namespace CodeAnalysis
                                  ToDirBaseString );
 
       }
-
-
     }
     catch( Exception Except )
       {
@@ -212,7 +207,13 @@ namespace CodeAnalysis
 
 
 
+
 /*
+Mark the preprocessed lines:
+.Mark = true
+.Mark = false
+
+
 
         string[] SplitString = Line.Split( new Char[] { '\t' } );
 
