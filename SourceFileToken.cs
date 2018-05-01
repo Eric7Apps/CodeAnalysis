@@ -14,7 +14,7 @@ namespace CodeAnalysis
   private MainForm MForm;
   internal string Text = "";
   internal EnumTokenType TokenType = EnumTokenType.Character;
-
+  internal string Comment = "";
 
 
   internal enum EnumTokenType { StringLiteral,
@@ -35,6 +35,22 @@ namespace CodeAnalysis
     MForm = UseForm;
 
     }
+
+
+
+  internal string ObjectToString()
+    {
+    // Turn this into a string for keeping in a file.
+    return "";
+    }
+
+
+
+  internal bool StringToObject()
+    {
+    return true;
+    }
+
 
 
 /*
