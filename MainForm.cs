@@ -6,6 +6,7 @@
 // Code Analysis
 
 
+
 // Do math as a language.  With a language parser
 // and all.  It supercedes the older form of the
 // language of mathematics.
@@ -28,7 +29,7 @@ namespace CodeAnalysis
 {
   public partial class MainForm : Form
   {
-  internal const string VersionDate = "4/28/2018";
+  internal const string VersionDate = "5/1/2018";
   internal const int VersionNumber = 09; // 0.9
   // private System.Threading.Mutex SingleInstanceMutex = null;
   // private bool IsSingleInstance = false;
@@ -155,11 +156,21 @@ namespace CodeAnalysis
     // string FileName =
     //      "C:\\GccOriginal\\gcc\\main.c";
 
+    // string FileName =
+    //     "C:\\GccOriginal\\gcc\\toplev.c";
+
+    // string FileName =
+    //     "C:\\GccOriginal\\gcc\\config.h";
+
     string FileName =
-         "C:\\GccOriginal\\gcc\\toplev.c";
+         "C:\\GccOriginal\\gcc\\system.h";
 
+    PreProcessor PreProc = new PreProcessor( this );
 
-    SourceFile SFile = new SourceFile( this, FileName );
+    SourceFile SFile = new SourceFile( this,
+                                       FileName,
+                                       PreProc );
+
     // SFile.ShowDingbatCharacters();
     SFile.DoPreprocessing();
     }
