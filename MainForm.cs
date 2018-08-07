@@ -1,24 +1,18 @@
 // Copyright Eric Chauvin 2018.
 // My blog is at:
-// ericsourcecode.blogspot.com
+// https://scientificmodels.blogspot.com/
+
 
 
 // Code Analysis
 
 
 
-// Do math as a language.  With a language parser
-// and all.  It supercedes the older form of the
-// language of mathematics.
-
-
 using System;
-// using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
-// using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
@@ -29,7 +23,7 @@ namespace CodeAnalysis
 {
   public partial class MainForm : Form
   {
-  internal const string VersionDate = "5/1/2018";
+  internal const string VersionDate = "8/7/2018";
   internal const int VersionNumber = 09; // 0.9
   // private System.Threading.Mutex SingleInstanceMutex = null;
   // private bool IsSingleInstance = false;
@@ -38,6 +32,7 @@ namespace CodeAnalysis
   internal const string MessageBoxTitle = "Code Analysis";
   private string DataDirectory = "";
   // private ConfigureFile ConfigFile;
+
 
 
   public MainForm()
@@ -135,23 +130,17 @@ namespace CodeAnalysis
     */
 
 
-    // string FileName = "C:\\JavaSource\\javax\\swing\\JFrame.java";
-    // ProcessOneJavaFile( FileName );
-
     // ProjectFiles ProjFiles = new ProjectFiles( this );
+
+    // ShowStatus( "Starting FindProjectFiles." );
     // ProjFiles.FindProjectFiles();
 
-    // ProjFiles.CopyDirectoryTree( "C:\\JavaSource",
-    //                             "C:\\JavaSource",
-    //                             "C:\\JavaSourceOut" );
+    // ProjFiles.CopyDirectoryTree( "C:\\GccOriginal\\",
+    //                             "C:\\GccOriginal\\",
+    //                             "C:\\GccOut\\" );
     // ShowStatus( " " );
     // ShowStatus( "Finished making directories." );
 
-
-    // That configure file that is set up from a
-    // script:
-    // string FileName =
-    //      "C:\\GccOriginal\\fixincludes\\config.h.in";
 
     // string FileName =
     //      "C:\\GccOriginal\\gcc\\main.c";
@@ -162,40 +151,47 @@ namespace CodeAnalysis
     // string FileName =
     //     "C:\\GccOriginal\\gcc\\config.h";
 
-    string FileName =
-         "C:\\GccOriginal\\gcc\\system.h";
+    // string FileName =
+    //     "C:\\GccOriginal\\gcc\\system.h";
 
-    PreProcessor PreProc = new PreProcessor( this );
+    string FileName =
+              "C:\\Eric\\ClimateModel\\ModelConstants.cs";
 
     SourceFile SFile = new SourceFile( this,
-                                       FileName,
-                                       PreProc );
+                                       FileName );
 
     // SFile.ShowDingbatCharacters();
-    SFile.DoPreprocessing();
+    SFile.ReadFromTextFile();
+    SFile.RemoveStarComments();
+    // SFile.FixLineSplices();
+    SFile.RemoveAllDoubleSlashComments();
+    // SFile.ShowLines();
+
+    StringArray SArray = SFile.GetMainSArrayCopy();
+    CSharpToObjects CSToObjects = new
+                   CSharpToObjects( this, SArray );
+
+    // CSToObjects.ShowLines();
+    // ShowStatus( " " );
+    // ShowStatus( " " );
+    string Result = CSToObjects.MakeAllObjects();
+    if( Result.Contains( Char.ToString(
+                      Constants.MarkerErrorPoint )))
+      {
+      ShowStatus( " " );
+      ShowStatus( "There was an error after CSToObjects." );
+      return;
+      }
+
+    CSharpParse2 CSParse2 = new CSharpParse2( this );
+    Result = CSParse2.ParseAll( Result );
+
+    ShowStatus( " " );
+    ShowStatus( "That's it." );
     }
     catch( Exception Except )
       {
       ShowStatus( "Exception in lexicalAnalysisToolStripMenuItem_Click()" );
-      ShowStatus( Except.Message );
-      }
-    }
-
-
-
-
-  private void ProcessOneJavaFile( string FileName )
-    {
-    try
-    {
-    LexAnalysis1 Lex1 = new LexAnalysis1( this, FileName );
-    Lex1.ProcessSyntax();
-    Lex1.ProcessComments();
-
-    }
-    catch( Exception Except )
-      {
-      ShowStatus( "Exception in ProcessOneFile():" );
       ShowStatus( Except.Message );
       }
     }
