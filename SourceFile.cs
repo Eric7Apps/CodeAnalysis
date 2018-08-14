@@ -1,31 +1,10 @@
 // Copyright Eric Chauvin 2018.
 // My blog is at:
-// ericsourcecode.blogspot.com
-
-// Lexical Conventions:
-// https://docs.microsoft.com/en-us/cpp/cpp/lexical-conventions
-
-// https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-directives
-
-
-// https://docs.microsoft.com/en-us/cpp/preprocessor/phases-of-translation
-
-
-
-// C++ Language Reference:
-// https://docs.microsoft.com/en-us/cpp/cpp/cpp-language-reference
-
-// Identifiers:
-// https://docs.microsoft.com/en-us/cpp/cpp/identifiers-cpp
-
-// https://docs.microsoft.com/en-us/cpp/cpp/identifiers-cpp
-
-// https://en.wikipedia.org/wiki/C_preprocessor
+// https://scientificmodels.blogspot.com/
 
 
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
@@ -38,18 +17,10 @@ namespace CodeAnalysis
   private MainForm MForm;
   private StringArray MainSArray;
   private string FileName = "";
-  private string LocalIncludeDirectory = "";
-  private SourceFileToken[] TokenArray;
-  private int TokenArrayLast = 0;
-  private PreProcessor PreProc;
 
-  // I am using what are called the "Dingbat"
-  // characters as markers or delimiters.
-  private const char SlashStarDingbat = (char)0x2700;
-  private const char StarSlashDingbat = (char)0x2701;
-  private const char DoubleSlashDingbat = (char)0x2702;
-  private const char EscapedQuoteDingbat = (char)0x2703;
-
+  private const char SlashStarMarker = (char)0x2700;
+  private const char StarSlashMarker = (char)0x2701;
+  private const char DoubleSlashMarker = (char)0x2702;
 
 
   private SourceFile()
@@ -59,101 +30,39 @@ namespace CodeAnalysis
 
 
   internal SourceFile( MainForm UseForm,
-                       string UseFileName,
-                       PreProcessor UsePreProc )
+                       string UseFileName )
     {
     MForm = UseForm;
     FileName = UseFileName;
-    PreProc = UsePreProc;
-
-    // If the included file has quotes around it.
-    LocalIncludeDirectory =
-              Path.GetDirectoryName( FileName );
-
-    LocalIncludeDirectory += "\\";
-
-    ShowStatus( "LocalIncludeDirectory: " +
-                              LocalIncludeDirectory );
-
 
     // File.GetAttributes()
     // File.ReadAllBytes()
     // File.WriteAllBytes()
-
     // Path.ChangeExtension()
     // Path.GetExtension()
     // Path.GetFileName()
     // Path.GetFullPath()
 
     MainSArray = new StringArray( MForm );
-    TokenArray = new SourceFileToken[2];
     }
 
-
-
-  private void AppendToken( SourceFileToken Token )
-    {
-    try
-    {
-    TokenArray[TokenArrayLast] = Token;
-    TokenArrayLast++;
-
-    if( TokenArrayLast >= TokenArray.Length )
-      {
-      Array.Resize( ref TokenArray, TokenArray.Length + (1024 * 16) );
-      }
-    }
-    catch( Exception Except )
-      {
-      ShowStatus( "Could not resize the array in AppendToken()." );
-      ShowStatus( Except.Message );
-      }
-    }
 
 
 
   private void ShowStatus( string ToShow )
     {
-    if( MForm == null )
-      {
-      // Writing from another thread?
-      return;
-      }
+    if( MForm != null )
+      MForm.ShowStatus( ToShow );
 
-    MForm.ShowStatus( ToShow );
     }
 
 
 
-  /*
-  internal void ShowDingbatCharacters()
+
+  internal bool ReadFromTextFile()
     {
-    ShowStatus( "SlashStarDingbat: " +
-           Char.ToString( SlashStarDingbat ));
-
-    ShowStatus( "StarSlashDingbat: " +
-           Char.ToString( StarSlashDingbat ));
-
-    ShowStatus( "DoubleSlashDingbat: " +
-           Char.ToString( DoubleSlashDingbat ));
-
-    for( int Count = 0x2700; Count <= 0x27BF; Count++ )
-      {
-      char OneChar = (char)Count;
-      ShowStatus( Count.ToString( "X4" ) +
-             ": " + Char.ToString( OneChar ));
-
-      }
-    }
-    */
-
-
-
-  private bool ReadFromTextFile()
+    try
     {
-    // try
-    // {
-
     MainSArray.Clear();
     if( !File.Exists( FileName ))
       {
@@ -178,8 +87,8 @@ namespace CodeAnalysis
         string SlashStar = "/" + "*";
         string StarSlash = "*" + "/";
 
-        Line = Line.Replace( SlashStar, Char.ToString( SlashStarDingbat ));
-        Line = Line.Replace( StarSlash, Char.ToString( StarSlashDingbat ));
+        Line = Line.Replace( SlashStar, Char.ToString( SlashStarMarker ));
+        Line = Line.Replace( StarSlash, Char.ToString( StarSlashMarker ));
 
         // ShowStatus( Line );
 
@@ -190,7 +99,6 @@ namespace CodeAnalysis
       }
 
     return true;
-    /*
     }
     catch( Exception Except )
       {
@@ -198,13 +106,16 @@ namespace CodeAnalysis
       ShowStatus( Except.Message );
       return false;
       }
-      */
     }
 
 
-
+/*
   private bool ContainsTriGraph( string Line )
     {
+    // There are also DiGraphs.
+    // Digraph:        <%  %>   <:  :>  %:  %:%:
+    // Punctuator:      {   }   [   ]   #    ##
+
     // Test:
     // if( Line.Contains( "??" ))
       // return true;
@@ -238,7 +149,7 @@ namespace CodeAnalysis
 
     return false;
     }
-
+*/
 
 
 
@@ -255,6 +166,7 @@ namespace CodeAnalysis
       char ToCheck = InString[Count];
 
       // Get rid of control characters.
+      // This also replaces a tab with a space.
       if( ToCheck < ' ' )
         ToCheck = ' ';
 
@@ -262,6 +174,8 @@ namespace CodeAnalysis
       if( ToCheck >= 0xD800 )
         ToCheck = ' ';
 
+      // This has already been converted from UTF8
+      // to 16 bit characters.
       // if( (ToCheck >= 127) && (ToCheck <= 160))
       if( (ToCheck >= 127) && (ToCheck <= 255))
         ToCheck = ' ';
@@ -270,8 +184,8 @@ namespace CodeAnalysis
       // Multilingual Plane except what are called
       // the "Dingbat" characters which are used as
       // markers or delimiters so they shouldn't
-      // be in this.
-      if( (ToCheck >= 0x2700) && (ToCheck <= 0x27BF))
+      // be in this.  See the Markers.cs file.
+      if( Markers.IsMarker( ToCheck ))
         ToCheck = ' ';
 
       // Basic Multilingual Plane
@@ -304,8 +218,22 @@ namespace CodeAnalysis
 
 
 
-  private void RemoveStarComments()
+  internal void RemoveStarComments()
     {
+    // According to the Gnu Gcc documentation, it
+    // says that "Comments are not recognized within
+    // string literals."
+    // Notice how I have quoted text in the two
+    // lines above, where I quoted the Gnu Gcc
+    // documentation.  They are comments.  They are
+    // not string literals.
+    // In this C# code I have to define the string
+    // with separated characters like this:
+    // string StarSlash = "*" + "/";
+    // Otherwise it will interpret it as the end
+    // of a comment.  I am removing all commented
+    // out text before I look for string literals.
+
     StringBuilder SBuilder = new StringBuilder();
     int Last = MainSArray.GetLast();
     bool IsInsideComment = false;
@@ -317,16 +245,30 @@ namespace CodeAnalysis
       for( int CharCount = 0; CharCount < LineLength; CharCount++ )
         {
         char OneChar = Line[CharCount];
-        if( OneChar == SlashStarDingbat )
+        if( OneChar == SlashStarMarker )
           {
+          if( IsInsideComment )
+            {
+            // It shouldn't find this start marker
+            // if it's already inside a comment.
+            SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
+            MainSArray.SetStringAt(
+                       SBuilder.ToString(), Count );
+
+            ShowStatus( " " );
+            ShowStatus( "Error with nested comment at: " + Count.ToString());
+            return;
+            }
+
           IsInsideComment = true;
           // Replace a comment with white space so
-          // that token strings don't come together.
+          // that identifier strings don't come
+          // together.
           SBuilder.Append( " " );
           continue;
           }
 
-        if( OneChar == StarSlashDingbat )
+        if( OneChar == StarSlashMarker )
           {
           IsInsideComment = false;
           continue;
@@ -358,8 +300,10 @@ namespace CodeAnalysis
 
 
 
+/*
+Use this?
 
-  private void FixLineSplices()
+  internal void FixLineSplices()
     {
     int Last = MainSArray.GetLast();
     StringBuilder SBuilder = new StringBuilder();
@@ -381,7 +325,13 @@ namespace CodeAnalysis
       }
 
     string FileS = SBuilder.ToString();
-    FileS = FileS.Replace( "\\\n", " " );
+
+    // This would be a bad idea, but somebody
+    // could split a word right at the end
+    // of a line and it should join the word
+    // together with no space.
+    // FileS = FileS.Replace( "\\\n", " " );
+    FileS = FileS.Replace( "\\\n", "" );
 
     // Remove the beginning and ending white space.
     FileS = FileS.Trim();
@@ -394,19 +344,33 @@ namespace CodeAnalysis
       MainSArray.AppendStringToArray( FileLines[Count] );
 
     }
+*/
+
+
+
+  internal void RemoveAllDoubleSlashComments()
+    {
+    int Last = MainSArray.GetLast();
+    for( int Count = 0; Count < Last; Count++ )
+      {
+      string Line = MainSArray.GetStringAt( Count );
+      Line = RemoveDoubleSlashComments( Line );
+      MainSArray.SetStringAt( Line, Count );
+      }
+    }
 
 
 
   private string RemoveDoubleSlashComments( string Line )
     {
     string DoubleSlash = "/" + "/";
-    Line = Line.Replace( DoubleSlash, Char.ToString( DoubleSlashDingbat ));
+    Line = Line.Replace( DoubleSlash, Char.ToString( DoubleSlashMarker ));
     StringBuilder SBuilder = new StringBuilder();
     int LineLength = Line.Length;
     for( int Count = 0; Count < LineLength; Count++ )
       {
       char OneChar = Line[Count];
-      if( OneChar == DoubleSlashDingbat )
+      if( OneChar == DoubleSlashMarker )
         break;
 
       SBuilder.Append( Char.ToString( OneChar ));
@@ -417,284 +381,29 @@ namespace CodeAnalysis
 
 
 
-  internal void DoPreprocessing()
+  internal string GetFileAsString()
     {
-    ReadFromTextFile();
-    RemoveStarComments();
-    FixLineSplices();
-    // ShowLines();
-    MakeTokens();
-
-    }
-
-
-
-  private void MakeTokens()
-    {
-    TokenArrayLast = 0;
-    SourceFileToken Token = new SourceFileToken( MForm );
+    StringBuilder SBuilder = new StringBuilder();
 
     int Last = MainSArray.GetLast();
     for( int Count = 0; Count < Last; Count++ )
       {
-      if( !MForm.CheckEvents())
-        return;
-
       string Line = MainSArray.GetStringAt( Count );
-      Line = Line.Trim();
-
-      if( IsPreprocessorLine( Line ))
-        {
-        PreProc.ParseLine( Line );
-
-        Token.Text = Line.Trim();
-        Token.TokenType = SourceFileToken.
-                     EnumTokenType.PreProcessor;
-
-        AppendToken( Token );
-        AppendEndOfLineToken();
-        Token = new SourceFileToken( MForm );
+      if( Line.Length == 0 )
         continue;
-        }
 
-      MakeTokensFromLine( Line );
-      }
-    }
+      int LineNumber = Count + 1;
+      Line = Line +
+         Char.ToString( Markers.Begin ) +
+         Char.ToString( Markers.TypeLineNumber ) +
+         LineNumber.ToString() +
+         Char.ToString( Markers.End ) +
+         "\n";
 
-
-/*
-
-Token.Comment = "Something";
-
-======
-  private string MarkPreprocessorLine( string Line )
-    {
-    // #ifndef USED_FOR_TARGET
-    // #undef uintmax_t
-    // #endif
-
-    // #if defined(DBX_DEBUGGING_INFO) || defined(XCOFF_DEBUGGING_INFO)
-
-    // #ifdef XCOFF_DEBUGGING_INFO
-
-    // #ifdef HAVE_isl
-
-    // #ifndef GCC_SYSTEM_H
-    // #define GCC_SYSTEM_H
-
-    // #include "config.h"
-
-    }
-*/
-
-
-
-  private void MakeTokensFromLine( string Line )
-    {
-    Line = Line.Replace( "\\\"", Char.ToString( EscapedQuoteDingbat ));
-
-    SourceFileToken Token = new SourceFileToken( MForm );
-    StringBuilder SBuilder = new StringBuilder();
-
-    int Last = Line.Length;
-    bool IsInsideStringLiteral = false;
-    bool IsInsideIdentifier = false;
-
-    for( int Count = 0; Count < Last; Count++ )
-      {
-      char TestChar = Line[Count];
-
-      if( IsInsideStringLiteral )
-        {
-        IsInsideStringLiteral = ProcessLiteralString(
-                     TestChar,
-                     SBuilder,
-                     Line );
-
-        continue;
-        }
-      else
-        {
-        if( TestChar == '"' )
-          {
-          IsInsideStringLiteral = true;
-          continue;
-          }
-        }
-
-      if( IsInsideIdentifier )
-        {
-        IsInsideIdentifier = ProcessIdentifier(
-                             TestChar,
-                             SBuilder );
-
-        continue;
-        }
-
-      if( IsIdentifierCharacter( TestChar, 0 ))
-        {
-        IsInsideIdentifier = true;
-        SBuilder.Append( Char.ToString( TestChar ));
-        }
-      else
-        {
-        AppendCharacterToken( TestChar );
-        }
+      SBuilder.Append( Line );
       }
 
-    AppendEndOfLineToken();
-    }
-
-
-
-  private bool ProcessIdentifier(
-                     char TestChar,
-                     StringBuilder SBuilder )
-
-    {
-    if( IsIdentifierCharacter( TestChar, SBuilder.Length ))
-      {
-      SBuilder.Append( Char.ToString( TestChar ));
-      return true;
-      }
-
-    SourceFileToken Token = new SourceFileToken( MForm );
-    Token.Text = SBuilder.ToString();
-    SBuilder.Clear();
-    Token.TokenType = SourceFileToken.
-                       EnumTokenType.Identifier;
-
-    AppendToken( Token );
-    // ShowStatus( "Identifier: " + Token.Text );
-
-    // This TestChar is not an identifier
-    // character.
-    AppendCharacterToken( TestChar );
-
-    return false;
-    }
-
-
-
-  private bool ProcessLiteralString(
-                     char TestChar,
-                     StringBuilder SBuilder,
-                     string ShowLine )
-    {
-    if( TestChar != '"' )
-      {
-      SBuilder.Append( Char.ToString( TestChar ));
-      return true; // IsInsideString
-      }
-
-    SourceFileToken Token = new SourceFileToken( MForm );
-    Token.Text = SBuilder.ToString();
-    SBuilder.Clear();
-
-    // Put a normal quote character back in.
-    Token.Text = Token.Text.Replace( Char.ToString( EscapedQuoteDingbat ), "\"" );
-    ShowStatus( " " );
-    ShowStatus( "String literal: " + Token.Text );
-    ShowStatus( "ShowLine: " + ShowLine );
-    Token.TokenType = SourceFileToken.
-                        EnumTokenType.StringLiteral;
-
-    AppendToken( Token );
-    return false; // IsInsideString
-    }
-
-
-
-
-  private void AppendEndOfLineToken()
-    {
-    // ShowStatus( "EndOfLine token." );
-
-    SourceFileToken Token = new SourceFileToken( MForm );
-
-    Token.Text = "";
-    Token.TokenType = SourceFileToken.
-                     EnumTokenType.EndOfLine;
-
-    AppendToken( Token );
-    }
-
-
-
-
-  private void AppendCharacterToken( char Character )
-    {
-    // ShowStatus( "Single character token: " + Char.ToString( Character ));
-    SourceFileToken Token = new SourceFileToken( MForm );
-
-    Token.Text = Char.ToString( Character );
-    Token.TokenType = SourceFileToken.
-                     EnumTokenType.Character;
-
-    AppendToken( Token );
-    }
-
-
-
-  private bool IsPreprocessorLine( string Line )
-    {
-    // There can only be one preprocessor statement
-    // per line.
-
-    Line = Line.Trim();
-    if( Line.StartsWith( "#" ))
-      return true;
-
-    return false;
-    }
-
-
-
-  private bool IsIdentifierCharacter( char ToTest,
-                                      int Where )
-    {
-    if( Where > (1024 + 512))
-      throw( new Exception( "This identifier is way too long." ));
-
-    if( Where == 0 )
-      {
-      if( IsNumeral( ToTest ))
-        return false;
-
-      }
-
-    if( (ToTest == '_') ||
-         IsLetter( ToTest ) ||
-         IsNumeral( ToTest ))
-      return true;
-
-    return false;
-    }
-
-
-
-  private bool IsNumeral( char ToTest )
-    {
-    if( (ToTest >= '0') && (ToTest <= '9'))
-      return true;
-
-    return false;
-    }
-
-
-
-  private bool IsLetter( char ToTest )
-    {
-    if( (ToTest >= 'a') && (ToTest <= 'z'))
-      return true;
-
-    if( (ToTest >= 'A') && (ToTest <= 'Z'))
-      return true;
-
-    // You could add Chinese characters or something
-    // like that, so it's not just ASCII letters.
-
-    return false;
+    return SBuilder.ToString();
     }
 
 
