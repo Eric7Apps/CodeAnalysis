@@ -66,9 +66,12 @@ https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="CSharpParse2.cs" />
-    <Compile Include="CSharpToObjects.cs" />
+    <Compile Include="CSharpToNumbers.cs" />
+    <Compile Include="CSharpToIdentifiers.cs" />
+    <Compile Include="CSharpToCharacters.cs" />
+    <Compile Include="CSharpToStrings.cs" />
+    <Compile Include="Markers.cs" />
+    <Compile Include="CSharpFixIdentifiers.cs" />
     <Compile Include="HeaderFiles.cs" />
     <Compile Include="SourceFile.cs" />
     <Compile Include="ProjectFiles.cs" />
