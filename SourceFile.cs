@@ -389,6 +389,7 @@ Use this?
     for( int Count = 0; Count < Last; Count++ )
       {
       string Line = MainSArray.GetStringAt( Count );
+      Line = Line.Trim();
       if( Line.Length == 0 )
         continue;
 
