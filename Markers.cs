@@ -3,6 +3,11 @@
 // https://scientificmodels.blogspot.com/
 
 
+// Miscellaneous Symbols (2600–26FF)
+// Dingbats (2700–27BF)
+// Miscellaneous Symbols and Arrows (2B00–2BFF)
+
+
 
 using System;
 using System.Text;
@@ -24,10 +29,13 @@ namespace CodeAnalysis
   internal const char TypeIdentifier = (char)0x2707;
   internal const char ErrorPoint = (char)0x2708;
   internal const char TypeLineNumber = (char)0x2709;
+  internal const char SlashStar = (char)0x270A;
+  internal const char StarSlash = (char)0x270B;
+  internal const char DoubleSlash = (char)0x270C;
 
 
 
-  static internal bool IsMarker( char TestChar )
+  internal static bool IsMarker( char TestChar )
     {
     int Value = (int)TestChar;
     if( (Value >= 0x2700) && (Value <= 0x27BF))
