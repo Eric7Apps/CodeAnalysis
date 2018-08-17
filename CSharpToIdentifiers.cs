@@ -76,10 +76,30 @@ namespace CodeAnalysis
     int Last = InString.Length;
     for( int Count = 0; Count < Last; Count++ )
       {
+      if( IsInsideID && IsInsideObject )
+        {
+        ShowStatus( "This should never happen." );
+        ShowStatus( "IsInsideID && IsInsideObject" );
+        SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
+        return SBuilder.ToString();
+        }
+
       char TestChar = InString[Count];
 
       if( Count > 0 )
         PreviousChar = InString[Count - 1];
+
+      if( IsInsideID )
+        {
+        if( Markers.IsMarker( TestChar ))
+          {
+          IsInsideID = false;
+          SBuilder.Append( Char.ToString(
+                               Markers.End ));
+          SBuilder.Append( Char.ToString( TestChar ));
+          continue;
+          }
+        }
 
       if( IsInsideObject )
         {
@@ -89,6 +109,8 @@ namespace CodeAnalysis
         SBuilder.Append( Char.ToString( TestChar ));
         continue;
         }
+
+
 
       if( TestChar == Markers.Begin )
         {
