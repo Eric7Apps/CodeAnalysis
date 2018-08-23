@@ -98,6 +98,13 @@ namespace CodeAnalysis
 
       if( TestChar == Markers.Begin )
         {
+        if( IsInsideNumber )
+          {
+          IsInsideNumber = false;
+          SBuilder.Append( Char.ToString(
+                               Markers.End ));
+          }
+
         IsInsideObject = true;
         SBuilder.Append( Char.ToString( TestChar ));
         continue;
