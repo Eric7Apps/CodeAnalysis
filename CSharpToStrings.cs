@@ -47,8 +47,18 @@ namespace CodeAnalysis
 
     StringBuilder SBuilder = new StringBuilder();
 
+    // Notice the double slash in front of the quote
+    // character here at the end of the string:
+    // "c:\\BrowserECFiles\\PageFiles\\";
+
+    InString = InString.Replace( "\\\\",
+                Char.ToString( Markers.EscapedSlash ));
+
     InString = InString.Replace( "\\\"",
                 Char.ToString( Markers.EscapedDoubleQuote ));
+
+    InString = InString.Replace( "\'\"\'",
+                Char.ToString( Markers.QuoteAsSingleCharacter ));
 
     bool IsInsideObject = false;
     bool IsInsideString = false;
@@ -112,9 +122,15 @@ namespace CodeAnalysis
 
     string Result = SBuilder.ToString();
 
-    // Put escaped quote character back in.
+    Result = Result.Replace(
+      Char.ToString( Markers.QuoteAsSingleCharacter ),
+      "\'\"\'" );
+
     Result = Result.Replace( Char.ToString(
                      Markers.EscapedDoubleQuote ), "\\\"" );
+
+    Result = Result.Replace( Char.ToString(
+                     Markers.EscapedSlash ), "\\\\" );
 
     return Result;
     }
