@@ -43,6 +43,9 @@ namespace CodeAnalysis
     {
     StringBuilder SBuilder = new StringBuilder();
 
+    InString = InString.Replace( "\\\\",
+       Char.ToString( Markers.EscapedSlash ));
+
     // It could be '\''.
     InString = InString.Replace( "\\\'",
        Char.ToString( Markers.EscapedSingleQuote ));
@@ -112,6 +115,10 @@ namespace CodeAnalysis
     // Put the single quote character back in.
     Result = Result.Replace( Char.ToString(
              Markers.EscapedSingleQuote ), "\\\'" );
+
+    Result = Result.Replace(
+                Char.ToString( Markers.EscapedSlash ),
+                "\\\\" );
 
     return Result;
     }
