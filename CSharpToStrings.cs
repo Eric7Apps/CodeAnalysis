@@ -57,7 +57,17 @@ namespace CodeAnalysis
     InString = InString.Replace( "\\\"",
                 Char.ToString( Markers.EscapedDoubleQuote ));
 
-    InString = InString.Replace( "\'\"\'",
+    string SingleQuoteCharStr = "\'\"\'";
+    if( SingleQuoteCharStr.Length != 3 )
+      {
+      ShowStatus( "SingleQuoteCharStr.Length != 3" );
+      return Char.ToString( Markers.ErrorPoint );
+      }
+
+    // This means that the double quote inside single
+    // quotes will just be put inside the string
+    // literal.
+    InString = InString.Replace( SingleQuoteCharStr,
                 Char.ToString( Markers.QuoteAsSingleCharacter ));
 
     bool IsInsideObject = false;
@@ -124,7 +134,7 @@ namespace CodeAnalysis
 
     Result = Result.Replace(
       Char.ToString( Markers.QuoteAsSingleCharacter ),
-      "\'\"\'" );
+      SingleQuoteCharStr );
 
     Result = Result.Replace( Char.ToString(
                      Markers.EscapedDoubleQuote ), "\\\"" );
