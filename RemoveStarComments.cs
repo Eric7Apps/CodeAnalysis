@@ -56,6 +56,7 @@ namespace CodeAnalysis
     }
 
 
+
   internal string RemoveAllComments( string InString )
     {
     string Result = InString;
@@ -69,13 +70,54 @@ namespace CodeAnalysis
 
 
 
+  private string MarkLineNumbers( string InString )
+    {
+    StringBuilder SBuilder = new StringBuilder();
+
+    string[] SplitS = InString.Split( new Char[] { '\n' } );
+    int Last = SplitS.Length;
+    if( Last == 0 )
+      return "";
+
+    for( int Count = 0; Count < Last; Count++ )
+      {
+      string Line = SplitS[Count];
+      string TLine = Line.Trim();
+      if( TLine.Length == 0 )
+        continue;
+
+      int LineNumber = Count + 1;
+      Line = Line +
+         Char.ToString( Markers.Begin ) +
+         Char.ToString( Markers.TypeLineNumber ) +
+         LineNumber.ToString() +
+         Char.ToString( Markers.End ) +
+         "\n";
+
+      SBuilder.Append( Line );
+      }
+
+    return SBuilder.ToString();
+    }
+
+
+
   private string RemoveComments( string InString )
     {
+    // This ignores Markers.Begin, Markers.End
+    // and any other markers.
+
+    if( InString.Trim().Length == 0 )
+      return "";
+
     StringBuilder SBuilder = new StringBuilder();
 
     string SlashStar = "/" + "*";
     string StarSlash = "*" + "/";
 
+    // This replaces the comment marker strings
+    // anywhere and everywhere in the file.  Whether
+    // they are inside quotes or not.
     InString = InString.Replace( SlashStar, Char.ToString( Markers.SlashStar ));
     InString = InString.Replace( StarSlash, Char.ToString( Markers.StarSlash ));
 
@@ -83,8 +125,9 @@ namespace CodeAnalysis
     int Last = InString.Length;
     for( int Count = 0; Count < Last; Count++ )
       {
-      char OneChar = InString[Count];
-      if( OneChar == Markers.SlashStar )
+      char TestChar = InString[Count];
+
+      if( TestChar == Markers.SlashStar )
         {
         if( IsInsideComment )
           {
@@ -105,15 +148,27 @@ namespace CodeAnalysis
         continue;
         }
 
-      if( OneChar == Markers.StarSlash )
+      if( TestChar == Markers.StarSlash )
         {
         IsInsideComment = false;
         continue;
         }
 
       if( !IsInsideComment )
-        SBuilder.Append( Char.ToString( OneChar ));
+        {
+        if( TestChar == Markers.StarSlash )
+          {
+          // It shouldn't find this end marker
+          // if it's not already inside a comment.
+          SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
 
+          ShowStatus( " " );
+          ShowStatus( "Error with start-slash outside of a comment at: " + Count.ToString());
+          return SBuilder.ToString();
+          }
+
+        SBuilder.Append( Char.ToString( TestChar ));
+        }
       }
 
     return SBuilder.ToString();
@@ -208,37 +263,6 @@ Do something like this?
     return false;
     }
 */
-
-
-
-
-  private string MarkLineNumbers( string InString )
-    {
-    StringBuilder SBuilder = new StringBuilder();
-
-    string[] SplitS = InString.Split( new Char[] { '\n' } );
-    int Last = SplitS.Length;
-    for( int Count = 0; Count < Last; Count++ )
-      {
-      string Line = SplitS[Count];
-      string TLine = Line.Trim();
-      if( TLine.Length == 0 )
-        continue;
-
-      int LineNumber = Count + 1;
-      Line = Line +
-         Char.ToString( Markers.Begin ) +
-         Char.ToString( Markers.TypeLineNumber ) +
-         LineNumber.ToString() +
-         Char.ToString( Markers.End ) +
-         "\n";
-
-      SBuilder.Append( Line );
-      }
-
-    return SBuilder.ToString();
-    }
-
 
 
 
