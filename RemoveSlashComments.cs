@@ -78,13 +78,22 @@ namespace CodeAnalysis
     StringBuilder SBuilder = new StringBuilder();
 
     Line = Line.Replace( "\\\\",
-                Char.ToString( Markers.EscapedSlash ));
+         Char.ToString( Markers.EscapedSlash ));
 
     Line = Line.Replace( "\\\"",
-                Char.ToString( Markers.EscapedDoubleQuote ));
+         Char.ToString( Markers.EscapedDoubleQuote ));
 
-    Line = Line.Replace( "\'\"\'",
-                Char.ToString( Markers.QuoteAsSingleCharacter ));
+    // This double quote inside single quotes can't
+    // be inside of a normal string literal.
+    string SingleQuoteCharStr = "\'\"\'";
+    if( SingleQuoteCharStr.Length != 3 )
+      {
+      ShowStatus( "SingleQuoteCharStr.Length != 3" ); 
+      return Char.ToString( Markers.ErrorPoint );
+      }
+
+    Line = Line.Replace( SingleQuoteCharStr,
+         Char.ToString( Markers.QuoteAsSingleCharacter ));
 
     string DoubleSlash = "/" + "/";
     Line = Line.Replace( DoubleSlash, Char.ToString( Markers.DoubleSlash ));
@@ -94,25 +103,25 @@ namespace CodeAnalysis
     bool IsInsideString = false;
     for( int Count = 0; Count < LineLength; Count++ )
       {
-      char OneChar = Line[Count];
+      char TestChar = Line[Count];
 
       if( IsInsideString )
         {
-        if( OneChar == '"' )
+        if( TestChar == '"' )
           IsInsideString = false;
 
         }
       else
         {
         // It's not inside the string.
-        if( OneChar == '"' )
+        if( TestChar == '"' )
           IsInsideString = true;
 
         }
 
       if( !IsInsideString )
         {
-        if( OneChar == Markers.DoubleSlash )
+        if( TestChar == Markers.DoubleSlash )
           {
           // This will stay false until it gets to
           // the Begin marker for the line number.
@@ -121,11 +130,11 @@ namespace CodeAnalysis
         }
 
       // This is for the line number markers.
-      if( OneChar == Markers.Begin )
+      if( TestChar == Markers.Begin )
         IsInside = true;
 
       if( IsInside )
-        SBuilder.Append( Char.ToString( OneChar ));
+        SBuilder.Append( Char.ToString( TestChar ));
 
       }
 
@@ -135,7 +144,7 @@ namespace CodeAnalysis
 
     Result = Result.Replace(
       Char.ToString( Markers.QuoteAsSingleCharacter ),
-      "\'\"\'" );
+      SingleQuoteCharStr );
 
     Result = Result.Replace( Char.ToString(
                      Markers.EscapedDoubleQuote ), "\\\"" );
