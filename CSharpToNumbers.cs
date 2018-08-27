@@ -4,6 +4,16 @@
 
 
 
+// This is only the first approximation.
+// It will have to parse the whole number in a
+// later stage before it can figure out if it's
+// really a valid number or not.
+
+// Octal numbers are not used here since they are
+// antiquated.
+
+
+
 using System;
 using System.Text;
 
@@ -74,7 +84,6 @@ namespace CodeAnalysis
     char NextChar = '\n';
     bool IsInsideNumber = false;
     bool IsInsideObject = false;
-    int Position = 0;
     int Last = InString.Length;
     for( int Count = 0; Count < Last; Count++ )
       {
@@ -87,11 +96,9 @@ namespace CodeAnalysis
       else
         NextChar = '\n';
 
-      if( IsInsideObject )
+      if( TestChar == Markers.End )
         {
-        if( TestChar == Markers.End )
-          IsInsideObject = false;
-
+        IsInsideObject = false;
         SBuilder.Append( Char.ToString( TestChar ));
         continue;
         }
@@ -110,13 +117,15 @@ namespace CodeAnalysis
         continue;
         }
 
+      if( IsInsideObject )
+        {
+        SBuilder.Append( Char.ToString( TestChar ));
+        continue;
+        }
+
       if( !IsInsideNumber )
         {
-        Position = 0;
-        if( IsNumberCharacter( TestChar,
-                               PreviousChar,
-                               NextChar,
-                               Position ))
+        if( IsNumberStart( TestChar ))
           {
           IsInsideNumber = true;
           SBuilder.Append( Char.ToString(
@@ -126,24 +135,23 @@ namespace CodeAnalysis
           SBuilder.Append( Char.ToString( TestChar ));
           continue;
           }
-        }
-      else
-        {
-        // It is inside.
-        Position++;
-        if( !IsNumberCharacter( TestChar,
-                                PreviousChar,
-                                NextChar,
-                                Position ))
-          {
-          IsInsideNumber = false;
-          SBuilder.Append( Char.ToString(
-                               Markers.End ));
-          SBuilder.Append( Char.ToString( TestChar ));
-          continue;
-          }
+
+        SBuilder.Append( Char.ToString( TestChar ));
+        continue;
         }
 
+      // At this point it is inside a number.
+      if( !IsNumberCharacterContinued( TestChar,
+                                       PreviousChar,
+                                       NextChar ))
+        {
+        IsInsideNumber = false;
+        SBuilder.Append( Char.ToString( Markers.End ));
+        SBuilder.Append( Char.ToString( TestChar ));
+        continue;
+        }
+
+      // It is continuing inside a number.
       SBuilder.Append( Char.ToString( TestChar ));
       }
 
@@ -153,85 +161,66 @@ namespace CodeAnalysis
 
 
 
-
-  private bool IsNumberCharacter( char TestChar,
-                                  char PreviousChar,
-                                  char NextChar,
-                                  int Position )
+  private bool IsNumberStart( char TestChar )
     {
-    // This function is only the first approximation.
-    // It will have to parse the whole number in a
-    // later stage before it can figure out if it's
-    // really a valid number or not.
-
-    // Octal numbers are not used here since they are
-    // antiquated.
-
-    // If it doesn't see a decimal point or the e
-    // letter for the exponent, or the d or f suffix,
-    // then it assumes it's an integer value.
-
     // At this point any numeral is necessarily a
     // number, since this is not looking inside
     // of identifiers or strings or characters.
     if( IsNumeral( TestChar ))
       return true;
 
-    // Do some obvious false ones and return from
-    // this function sooner, even though this logic
-    // is redundant.
+    // If it is before the number starts then the
+    // negative sign is an operator.  Possibly a
+    // unary operator.
+    // if( TestChar == '-' )
 
-    if( TestChar == ' ' )
-      return false;
+    return false;
+    }
 
-    if( TestChar == ';' )
-      return false;
 
-    if( TestChar == ')' )
-      return false;
 
-    if( IsLetter( TestChar ) && (Position == 0))
-      return false;
 
-    if( TestChar == '.' )
-      {
-      if( Position == 0 )
-        return false;
-
+  private bool IsNumberCharacterContinued( 
+                                  char TestChar,
+                                  char PreviousChar,
+                                  char NextChar )
+    {
+    if( IsNumeral( TestChar ))
       return true;
-      }
+
+    // This would allow 1.2.3.4.5.6 and so on...
+    if( TestChar == '.' )
+      return true;
 
     if( TestChar == '-' )
       {
       if( !IsNumeral( NextChar ))
         return false;
 
-      if( Position != 0 )
-        {
-        // 18.46e-2
-        if( !((PreviousChar == 'e') ||
-              (PreviousChar == 'E')))
-          return false;
+      // 18.46e-2
+      if( !((PreviousChar == 'e') ||
+            (PreviousChar == 'E')))
+        return false;
 
-        }
       }
 
+    // This would allow 0x0x0x0x0 and so on...
     if( (TestChar == 'x') || (TestChar == 'X'))
       {
-      if( PreviousChar != '0' )
-        return false;
-
-      // This is the only place where there can
-      // be an X.
-      if( Position == 1 )
+      if( PreviousChar == '0' )
         return true;
-      else
-        return false;
 
       }
 
     // 18.46e-2d
-    if( (TestChar == 'd') ||
+    // 0xABCD
+    if( (TestChar == 'a') ||
+        (TestChar == 'A') ||
+        (TestChar == 'b') ||
+        (TestChar == 'B') ||
+        (TestChar == 'c') ||
+        (TestChar == 'C') ||
+        (TestChar == 'd') ||
         (TestChar == 'D') ||
         (TestChar == 'e') ||
         (TestChar == 'E') ||
@@ -245,18 +234,15 @@ namespace CodeAnalysis
         (TestChar == 'U'))
       {
       // 12lu is 12 as an unsigned long in C.
-      // if( !IsNumeral( PreviousChar ))
-        // return false;
 
-      // It would still think this is a number:
-      // 1d2d3d4f5F
+      // This still allows all kinds of things that
+      // aren't numbers, like 01abcdefu0x.
 
       return true;
       }
 
     return false;
     }
-
 
 
 
