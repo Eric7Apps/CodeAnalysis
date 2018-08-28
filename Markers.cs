@@ -32,6 +32,9 @@ namespace CodeAnalysis
   internal const char SlashStar = (char)0x270A;
   internal const char StarSlash = (char)0x270B;
   internal const char DoubleSlash = (char)0x270C;
+  internal const char TypeOperator = (char)0x270D;
+  internal const char EscapedSlash = (char)0x270E;
+  internal const char QuoteAsSingleCharacter = (char)0x270F;
 
 
 
