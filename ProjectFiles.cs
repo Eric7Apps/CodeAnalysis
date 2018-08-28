@@ -17,9 +17,9 @@ namespace CodeAnalysis
   private MainForm MForm;
   // private SortedDictionary<string, string> FilesDictionary;
   // private SortedDictionary<string, string> HeaderFilesDictionary;
-  // private string ProjectDirectory = "C:\\GccOriginal\\";
+  private string ProjectDirectory = "C:\\Eric\\";
   // private string ProjectDirectory = "C:\\glibc\\";
-  private string ProjectDirectory = "C:\\cygwin64\\";
+  // private string ProjectDirectory = "C:\\cygwin64\\";
   // private int FilesFound = 0;
   private HeaderFiles HeaderF;
 
@@ -46,13 +46,9 @@ namespace CodeAnalysis
 
   private void ShowStatus( string ToShow )
     {
-    if( MForm == null )
-      {
-      // Writing from another thread?
-      return;
-      }
+    if( MForm != null )
+      MForm.ShowStatus( ToShow );
 
-    MForm.ShowStatus( ToShow );
     }
 
 
@@ -70,7 +66,7 @@ namespace CodeAnalysis
     ShowStatus( " " );
     ShowStatus( "Finished searching files." );
 
-    HeaderF.ShowFiles();
+    // HeaderF.ShowFiles();
 
     // ShowStatus( "HeaderFilesFound: " + HeaderFilesFound.ToString( "N0" ));
     }
@@ -83,20 +79,30 @@ namespace CodeAnalysis
 
 
 
-  internal void SearchOneDirectory( string DirName )
+  internal bool SearchOneDirectory( string DirName )
     {
     try
     {
-    // ShowStatus( " " );
-    // ShowStatus( "Getting files in: " + DirName );
+    if( DirName.ToLower().Contains( "\\obj\\" ))
+      return true;
+
+    if( DirName.ToLower().Contains( "\\.vs\\" ))
+      return true;
+
+    if( DirName.ToLower().Contains( "\\bin\\" ))
+      return true;
+
+    ShowStatus( " " );
+    ShowStatus( "Getting files in: " + DirName );
 
     string[] FileEntries = Directory.GetFiles( DirName, "*.*" );
     foreach( string FileName in FileEntries )
       {
       if( !MForm.CheckEvents())
-        return;
+        return false;
 
-      ProcessOneFile( FileName );
+      if( !ProcessOneFile( FileName ))
+        return false;
 
       // FilesFound++;
       // if( FilesFound > 1000 )
@@ -108,47 +114,39 @@ namespace CodeAnalysis
     foreach( string SubDir in SubDirEntries )
       {
       if( !MForm.CheckEvents())
-        return;
+        return false;
 
       // Call itself recursively.
-      SearchOneDirectory( SubDir );
+      if( !SearchOneDirectory( SubDir ))
+        return false;
+
       }
+
+    return true;
     }
     catch( Exception Except )
       {
       ShowStatus( "Exception in SearchOneDirectory():" );
       ShowStatus( Except.Message );
+      return false;
       }
     }
 
 
 
-  private void ProcessOneFile( string FileName )
+  private bool ProcessOneFile( string FileName )
     {
-    // if( FileNameLower.StartsWith(
-    //           "c:\\gccoriginal\\libstdc++-v3\\" ))
-    //    return true;
-
-    // if( IsUnusedDirectory( FileName ))
-      // return;
-
     // if( IsKnownExtension( FileName ))
       // return;
 
     string FileNameLower = FileName.ToLower();
-    // if( !FileNameLower.EndsWith( "stdio.h" ))
-      // return;
-
-    // Set up locked keys or something.
-    // Appending: stdio.h:
-    // c:\gccoriginal\glibc\include\stdio.h
-
-
-    // ShowStatus( FileNameLower );
+    if( FileNameLower.Contains( ".designer." ))
+      return true;
 
     // I think .hh files are only used in libcc1,
     // which I think is related to the GDB debugger.
-    if( FileNameLower.EndsWith( ".h" )) // ||
+    if( FileNameLower.EndsWith( ".cs" ))
+    // if( FileNameLower.EndsWith( ".h" )) // ||
     //    FileNameLower.EndsWith( ".hh" ))
       {
       // string ToFile = Path.GetFileName( FileName );
@@ -158,149 +156,26 @@ namespace CodeAnalysis
       // exists, and see if they are the same.
       // File.ReadAllBytes()
 
+      ShowStatus( FileName );
+
+      TranslateCSharpFile TranslateCS = new
+                       TranslateCSharpFile( MForm );
+
+      string FileS = TranslateCS.TranslateFile( FileName );
+      if( FileS == "" )
+        {
+        ShowStatus( " " );
+        ShowStatus( "TranslateCS returned empty string for: " + FileName );
+        return false;
+        }
       // File.Copy( FileName, ToFile, true );
       // ShowStatus( ToFile );
       HeaderF.AddFile( FileName );
       }
+
+    return true;
     }
 
-
-
-  private bool IsUnusedDirectory( string FileName )
-    {
-    string FileNameLower = FileName.ToLower();
-
-    if( FileNameLower.StartsWith(
-             "c:\\gccoriginal\\config\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-             "c:\\gccoriginal\\contrib\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\ada\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\testsuite\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\doc\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\config\\" ))
-        return true;
-
-    // Drupal Portable Object?
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\po\\" ))
-        return true;
-
-    // Just In Time Compiler library.
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gcc\\jit\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\gotools" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\intl\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libatomic\\" ))
-        return true;
-
-    // I think this is related to GDB, the Gnu
-    // debugger.
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libcc1\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libcpp\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libffi\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libgcc\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libgo\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libgfortran\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libgomp\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libbacktrace\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libhsail-rt\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libiberty\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libitm\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libmpx\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\liboffloadmic\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libsanitizer\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libstdc++-v3\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libquadmath\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libssp\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\libvtv\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\zlib\\" ))
-        return true;
-
-    if( FileNameLower.StartsWith(
-               "c:\\gccoriginal\\lto-plugin\\" ))
-        return true;
-
-
-    return false;
-    }
 
 
 
@@ -366,8 +241,6 @@ namespace CodeAnalysis
     if( FileNameLower.EndsWith( ".m4" ))
       return true;
 
-
-
     if( FileNameLower.EndsWith( ".gitattributes" ))
       return true;
 
@@ -426,8 +299,6 @@ namespace CodeAnalysis
 
     if( FileNameLower.EndsWith( ".gperf" ))
       return true;
-
-
 
     return false;
     }
