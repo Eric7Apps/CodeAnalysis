@@ -66,9 +66,9 @@ https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild-reserved-and-well-
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="BracketLevel.cs" />
     <Compile Include="TestMarkers.cs" />
     <Compile Include="TranslateCSharpFile.cs" />
-    <Compile Include="Brackets.cs" />
     <Compile Include="CSharpToOperators.cs" />
     <Compile Include="RemoveSlashComments.cs" />
     <Compile Include="RemoveStarComments.cs" />
