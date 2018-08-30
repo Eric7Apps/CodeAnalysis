@@ -198,12 +198,6 @@ namespace CodeAnalysis
       return "";
       }
 
-    // ShowStatus( " " );
-    // ShowStatus( " " );
-    // ShowStatus( "Outside:" );
-    // ShowStatus( TestS );
-
-
     IDDictionary IdentDictionary = new
                                IDDictionary( MForm );
 
@@ -211,11 +205,11 @@ namespace CodeAnalysis
                         CSharpFixIdentifiers( MForm,
                                     IdentDictionary );
 
-    if( !CSFixIDs.GetIdentifiers( Result ))
-      {
-      ShowStatus( "GetIdentifiers returned false." );
-      return "";
-      }
+    // if( !CSFixIDs.GetIdentifiers( Result ))
+      // {
+      // ShowStatus( "GetIdentifiers returned false." );
+      // return "";
+      // }
 
     Result = CSFixIDs.MakeIdentifiersLowerCase( Result );
 
@@ -224,6 +218,14 @@ namespace CodeAnalysis
     CSFixIDs = null;
     if( !MForm.CheckEvents())
       return "";
+
+    BracketLevel BracketLev = new BracketLevel( MForm );
+    Result = BracketLev.SetLevelChars( Result );
+    if( Result == "" )
+      {
+      // ShowStatus( Result );
+      return "";
+      }
 
 
     // ShowStatus( Result );
