@@ -83,13 +83,16 @@ namespace CodeAnalysis
     {
     try
     {
-    if( DirName.ToLower().Contains( "\\obj\\" ))
+    if( DirName.ToLower().Contains( "\\obj" ))
       return true;
 
-    if( DirName.ToLower().Contains( "\\.vs\\" ))
+    if( DirName.ToLower().Contains( "\\.vs" ))
       return true;
 
-    if( DirName.ToLower().Contains( "\\bin\\" ))
+    if( DirName.ToLower().Contains( "\\bin" ))
+      return true;
+
+    if( DirName.ToLower().Contains( "\\properties" ))
       return true;
 
     ShowStatus( " " );
@@ -141,6 +144,9 @@ namespace CodeAnalysis
 
     string FileNameLower = FileName.ToLower();
     if( FileNameLower.Contains( ".designer." ))
+      return true;
+
+    if( FileNameLower.Contains( "blankfile.cs" ))
       return true;
 
     // I think .hh files are only used in libcc1,
