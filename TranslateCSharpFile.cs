@@ -219,8 +219,11 @@ namespace CodeAnalysis
     if( !MForm.CheckEvents())
       return "";
 
+
     BracketLevel BracketLev = new BracketLevel( MForm );
     Result = BracketLev.SetLevelChars( Result );
+    BracketLev = null;
+
     if( Result == "" )
       {
       // ShowStatus( Result );
@@ -228,9 +231,20 @@ namespace CodeAnalysis
       }
 
 
+    Token Tk = new Token( MForm );
+    Tk.AddTokensFromString( Result );
+    Tk.SetLowestTokenBlocks();
+
+    ShowStatus( " " );
+    Tk.ShowTokensAtLevel( 1 );
+
+    // return "";
+
     // ShowStatus( Result );
-    // ShowStatus( " " );
-    // ShowStatus( "That's it." );
+    ShowStatus( " " );
+    ShowStatus( "That's it." );
+    ShowStatus( " " );
+    ShowStatus( " " );
     return Result;
     }
 
