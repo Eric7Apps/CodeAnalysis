@@ -40,14 +40,13 @@ namespace CodeAnalysis
 
   internal bool TestBeginEnd( string InString )
     {
-    string[] SplitS = InString.Split( new Char[] { Markers.Begin } );
-
     StringBuilder SBuilder = new StringBuilder();
+
+    string[] SplitS = InString.Split( new Char[] { Markers.Begin } );
 
     SBuilder.Append( SplitS[0] + "\r\n" );
 
     int Last = SplitS.Length;
-
     // This starts at 1, after the first
     // Markers.Begin.
     for( int Count = 1; Count < Last; Count++ )
