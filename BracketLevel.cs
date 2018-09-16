@@ -108,12 +108,12 @@ namespace CodeAnalysis
       }
 
     string Result = SBuilder.ToString();
-    ShowAsTokens( Result );
+    // ShowAsTokens( Result );
     return Result;
     }
 
 
-
+/*
   internal void ShowAsTokens( string InString )
     {
     ShowStatus( " " );
@@ -128,8 +128,8 @@ namespace CodeAnalysis
       string Line = SplitS[Count];
       ShowStatus( Line );
       }
-
     }
+*/
 
 
 
