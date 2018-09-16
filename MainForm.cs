@@ -23,7 +23,7 @@ namespace CodeAnalysis
 {
   public partial class MainForm : Form
   {
-  internal const string VersionDate = "8/7/2018";
+  internal const string VersionDate = "9/16/2018";
   internal const int VersionNumber = 09; // 0.9
   // private System.Threading.Mutex SingleInstanceMutex = null;
   // private bool IsSingleInstance = false;
@@ -119,21 +119,15 @@ namespace CodeAnalysis
 
     // Path.GetFileName( OpenFileDialog1.FileName );
     string FileName = OpenFileDialog1.FileName;
-
-
-    // string FileName = GccPath + "toplev.c";
-    // string FileName = GccPath + "toplev.h";
-
-    // A shell script: config.gcc
-    // string FileName = GccPath + "config.in";
-    // #include "config.h"
     */
 
 
-    // ProjectFiles ProjFiles = new ProjectFiles( this );
+    ProjectFiles ProjFiles = new ProjectFiles( this );
 
     // ShowStatus( "Starting FindProjectFiles." );
-    // ProjFiles.FindProjectFiles();
+    ProjFiles.FindProjectFiles();
+
+    // ShowUnicodeCharacters();
 
     // ProjFiles.CopyDirectoryTree( "C:\\GccOriginal\\",
     //                             "C:\\GccOriginal\\",
@@ -142,52 +136,12 @@ namespace CodeAnalysis
     // ShowStatus( "Finished making directories." );
 
 
-    // string FileName =
-    //      "C:\\GccOriginal\\gcc\\main.c";
-
-    // string FileName =
-    //     "C:\\GccOriginal\\gcc\\toplev.c";
-
-    // string FileName =
-    //     "C:\\GccOriginal\\gcc\\config.h";
-
-    // string FileName =
-    //     "C:\\GccOriginal\\gcc\\system.h";
-
+    /*
     string FileName =
-              "C:\\Eric\\ClimateModel\\ModelConstants.cs";
+              "C:\\Eric\\ClimateModel\\MainForm.cs";
 
-    SourceFile SFile = new SourceFile( this,
-                                       FileName );
-
-    // SFile.ShowDingbatCharacters();
-    SFile.ReadFromTextFile();
-    SFile.RemoveStarComments();
-    // SFile.FixLineSplices();
-    SFile.RemoveAllDoubleSlashComments();
-    // SFile.ShowLines();
-
-    StringArray SArray = SFile.GetMainSArrayCopy();
-    CSharpToObjects CSToObjects = new
-                   CSharpToObjects( this, SArray );
-
-    // CSToObjects.ShowLines();
-    // ShowStatus( " " );
-    // ShowStatus( " " );
-    string Result = CSToObjects.MakeAllObjects();
-    if( Result.Contains( Char.ToString(
-                      Constants.MarkerErrorPoint )))
-      {
-      ShowStatus( " " );
-      ShowStatus( "There was an error after CSToObjects." );
-      return;
-      }
-
-    CSharpParse2 CSParse2 = new CSharpParse2( this );
-    Result = CSParse2.ParseAll( Result );
-
-    ShowStatus( " " );
-    ShowStatus( "That's it." );
+    TranslateCSharpFile( FileName );
+    */
     }
     catch( Exception Except )
       {
@@ -209,6 +163,40 @@ namespace CodeAnalysis
 
 
 
+  internal void ShowUnicodeCharacters()
+    {
+    for( int Count = 0x2200; Count <= 0x22FF; Count++ )
+      {
+      char ShowChar = (char)Count;
+      ShowStatus( Count.ToString( "X4" ) + ": " + Char.ToString( ShowChar ));
+      }
+
+      // Basic Multilingual Plane
+      // C0 Controls and Basic Latin (Basic Latin)
+      //                 (0000007F)
+      // C1 Controls and Latin-1 Supplement (008000FF)
+      // Latin Extended-A (0100017F)
+      // Latin Extended-B (0180024F)
+      // IPA Extensions (025002AF)
+      // Spacing Modifier Letters (02B002FF)
+      // Combining Diacritical Marks (0300036F)
+      // General Punctuation (2000206F)
+      // Superscripts and Subscripts (2070209F)
+      // Currency Symbols (20A020CF)
+      // Combining Diacritical Marks for Symbols (20D020FF)
+      // Letterlike Symbols (2100214F)
+      // Number Forms (2150218F)
+      // Arrows (219021FF)
+      // Mathematical Operators (220022FF)
+      // Box Drawing (2500257F)
+      // Geometric Shapes (25A025FF)
+      // Miscellaneous Symbols (260026FF)
+      // Dingbats (270027BF)
+      // Miscellaneous Symbols and Arrows (2B002BFF)
+      // Control characters.
+    }
+
+      
 
   }
 }
