@@ -21,36 +21,10 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class CSharpToNumbers
+  static class CSharpToNumbers
   {
-  private MainForm MForm;
 
-
-
-  private CSharpToNumbers()
-    {
-    }
-
-
-
-  internal CSharpToNumbers( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-
-  private bool IsNumeral( char ToTest )
+  private static bool IsNumeral( char ToTest )
     {
     if( (ToTest >= '0') && (ToTest <= '9'))
       return true;
@@ -60,7 +34,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsLetter( char ToTest )
+  private static bool IsLetter( char ToTest )
     {
     if( (ToTest >= 'a') && (ToTest <= 'z'))
       return true;
@@ -76,7 +50,7 @@ namespace CodeAnalysis
 
 
 
-  internal string MakeNumberObjects( string InString )
+  internal static string MakeNumberObjects( string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -161,7 +135,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsNumberStart( char TestChar )
+  private static bool IsNumberStart( char TestChar )
     {
     // At this point any numeral is necessarily a
     // number, since this is not looking inside
@@ -180,7 +154,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsNumberCharacterContinued( 
+  private static bool IsNumberCharacterContinued(
                                   char TestChar,
                                   char PreviousChar,
                                   char NextChar )
