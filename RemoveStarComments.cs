@@ -29,40 +29,16 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class RemoveStarComments
+  static class RemoveStarComments
   {
-  private MainForm MForm;
 
 
-
-  private RemoveStarComments()
-    {
-    }
-
-
-
-  internal RemoveStarComments( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal string RemoveAllComments( string InString )
+  internal static string RemoveAllComments( MainForm MForm, string InString )
     {
     string Result = InString;
 
     Result = MarkLineNumbers( Result );
-    Result = RemoveComments( Result );
+    Result = RemoveComments( MForm, Result );
     // Result = FixLineSplices();
 
     return Result;
@@ -70,7 +46,7 @@ namespace CodeAnalysis
 
 
 
-  private string MarkLineNumbers( string InString )
+  private static string MarkLineNumbers( string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -102,7 +78,7 @@ namespace CodeAnalysis
 
 
 
-  private string RemoveComments( string InString )
+  private static string RemoveComments( MainForm MForm, string InString )
     {
     // This ignores Markers.Begin, Markers.End
     // and any other markers.
@@ -135,8 +111,8 @@ namespace CodeAnalysis
           // if it's already inside a comment.
           SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
 
-          ShowStatus( " " );
-          ShowStatus( "Error with nested comment at: " + Count.ToString());
+          MForm.ShowStatus( " " );
+          MForm.ShowStatus( "Error with nested comment at: " + Count.ToString());
           return SBuilder.ToString();
           }
 
@@ -162,8 +138,8 @@ namespace CodeAnalysis
           // if it's not already inside a comment.
           SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
 
-          ShowStatus( " " );
-          ShowStatus( "Error with start-slash outside of a comment at: " + Count.ToString());
+          MForm.ShowStatus( " " );
+          MForm.ShowStatus( "Error with start-slash outside of a comment at: " + Count.ToString());
           return SBuilder.ToString();
           }
 
