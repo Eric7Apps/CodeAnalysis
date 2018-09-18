@@ -12,36 +12,12 @@ using System.IO;
 
 namespace CodeAnalysis
 {
-  class SourceFile
+  static class SourceFile
   {
-  private MainForm MForm;
-
-
-  private SourceFile()
-    {
-    }
 
 
 
-  internal SourceFile( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-
-  internal string ReadFromTextFile( string FileName )
+  internal static string ReadFromTextFile( MainForm MForm, string FileName )
     {
     try
     {
@@ -55,8 +31,8 @@ namespace CodeAnalysis
 
     if( !File.Exists( FileName ))
       {
-      ShowStatus( "The file doesn't exist." );
-      ShowStatus( FileName );
+      MForm.ShowStatus( "The file doesn't exist." );
+      MForm.ShowStatus( FileName );
       return "";
       }
 
@@ -85,21 +61,22 @@ namespace CodeAnalysis
     }
     catch( Exception Except )
       {
-      ShowStatus( "Could not read the file: \r\n" + FileName );
-      ShowStatus( Except.Message );
+      MForm.ShowStatus( "Could not read the file: \r\n" + FileName );
+      MForm.ShowStatus( Except.Message );
       return "";
       }
     }
 
 
 
-  private string GetCleanUnicodeString( string InString )
+  private static string GetCleanUnicodeString( string InString )
     {
     if( InString == null )
       return "";
 
     StringBuilder SBuilder = new StringBuilder();
-    for( int Count = 0; Count < InString.Length; Count++ )
+    int Last = InString.Length;
+    for( int Count = 0; Count < Last; Count++ )
       {
       char ToCheck = InString[Count];
 
@@ -114,7 +91,6 @@ namespace CodeAnalysis
 
       // This has already been converted from UTF8
       // to 16 bit characters.
-      // if( (ToCheck >= 127) && (ToCheck <= 160))
       if( (ToCheck >= 127) && (ToCheck <= 255))
         ToCheck = ' ';
 
