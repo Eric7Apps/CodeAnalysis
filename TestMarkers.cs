@@ -11,34 +11,11 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class TestMarkers
+  static class TestMarkers
   {
-  private MainForm MForm;
 
 
-  private TestMarkers()
-    {
-    }
-
-
-
-  internal TestMarkers( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal bool TestBeginEnd( string InString )
+  internal static bool TestBeginEnd( MainForm MForm, string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -56,24 +33,22 @@ namespace CodeAnalysis
 
       if( !Line.Contains( Char.ToString( Markers.End )))
         {
-        ShowStatus( SBuilder.ToString() );
-        ShowStatus( " " );
-        ShowStatus( "The line has no end marker." );
-        ShowStatus( "Line: " + Line );
+        MForm.ShowStatus( SBuilder.ToString() );
+        MForm.ShowStatus( " " );
+        MForm.ShowStatus( "The line has no end marker." );
+        MForm.ShowStatus( "Line: " + Line );
         return false;
         }
 
       string[] SplitLine = Line.Split( new Char[] { Markers.End } );
       if( SplitLine.Length < 2 )
         {
-        ShowStatus( SBuilder.ToString() );
-        ShowStatus( " " );
-        ShowStatus( "SplitLine.Length < 2." );
-        ShowStatus( Line );
+        MForm.ShowStatus( SBuilder.ToString() );
+        MForm.ShowStatus( " " );
+        MForm.ShowStatus( "SplitLine.Length < 2." );
+        MForm.ShowStatus( Line );
         return false;
         }
-
-      // ShowStatus( SplitLine[1] );
       }
 
     return true;
@@ -81,7 +56,7 @@ namespace CodeAnalysis
 
 
 
-  internal string RemoveOutsideWhiteSpace( string InString )
+  internal static string RemoveOutsideWhiteSpace( string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -127,7 +102,7 @@ namespace CodeAnalysis
 
 
 
-  internal bool TestBrackets( string InString )
+  internal static bool TestBrackets( MainForm MForm, string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
     int BracketCount = 0;
@@ -158,9 +133,8 @@ namespace CodeAnalysis
         ShowS = ShowS.Replace(
              Char.ToString( Markers.Begin ), "\r\n" );
 
-        ShowStatus( ShowS );
-        ShowStatus( "This is not a bracket: " + Char.ToString( TestChar ));
-
+        MForm.ShowStatus( ShowS );
+        MForm.ShowStatus( "This is not a bracket: " + Char.ToString( TestChar ));
         return false;
         }
 
@@ -176,8 +150,8 @@ namespace CodeAnalysis
         ShowS = ShowS.Replace(
              Char.ToString( Markers.Begin ), "\r\n" );
 
-        ShowStatus( ShowS );
-        ShowStatus( "Bracket count went negative." );
+        MForm.ShowStatus( ShowS );
+        MForm.ShowStatus( "Bracket count went negative." );
         return false;
         }
 
@@ -185,7 +159,7 @@ namespace CodeAnalysis
 
     if( BracketCount != 0 )
       {
-      ShowStatus( "Bracket count is not zero at the end." );
+      MForm.ShowStatus( "Bracket count is not zero at the end." );
       return false;
       }
 
