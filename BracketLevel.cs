@@ -11,35 +11,10 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class BracketLevel
+  static class BracketLevel
   {
-  private MainForm MForm;
 
-
-
-  private BracketLevel()
-    {
-    }
-
-
-
-  internal BracketLevel( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal string SetLevelChars( string InString )
+  internal static string SetLevelChars( MainForm MForm, string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -78,8 +53,8 @@ namespace CodeAnalysis
         ShowS = ShowS.Replace(
              Char.ToString( Markers.Begin ), "\r\n" );
 
-        ShowStatus( ShowS );
-        ShowStatus( "This should only be a bracket: " + Char.ToString( TestChar ));
+        MForm.ShowStatus( ShowS );
+        MForm.ShowStatus( "This should only be a bracket: " + Char.ToString( TestChar ));
         return "";
         }
 
@@ -95,15 +70,15 @@ namespace CodeAnalysis
         ShowS = ShowS.Replace(
              Char.ToString( Markers.Begin ), "\r\n" );
 
-        ShowStatus( ShowS );
-        ShowStatus( "Bracket count went negative." );
+        MForm.ShowStatus( ShowS );
+        MForm.ShowStatus( "Bracket count went negative." );
         return "";
         }
       }
 
     if( Level != 0 )
       {
-      ShowStatus( "Bracket count is not zero at the end." );
+      MForm.ShowStatus( "Bracket count is not zero at the end." );
       return "";
       }
 
@@ -135,3 +110,4 @@ namespace CodeAnalysis
 
   }
 }
+
