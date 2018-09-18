@@ -11,35 +11,11 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class CSharpToIdentifiers
+  static class CSharpToIdentifiers
   {
-  private MainForm MForm;
 
 
-  private CSharpToIdentifiers()
-    {
-    }
-
-
-
-  internal CSharpToIdentifiers( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-
-  private bool IsNumeral( char ToTest )
+  private static bool IsNumeral( char ToTest )
     {
     if( (ToTest >= '0') && (ToTest <= '9'))
       return true;
@@ -49,7 +25,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsLetter( char ToTest )
+  private static bool IsLetter( char ToTest )
     {
     if( (ToTest >= 'a') && (ToTest <= 'z'))
       return true;
@@ -65,7 +41,7 @@ namespace CodeAnalysis
 
 
 
-  internal string MakeIdentifierObjects( string InString )
+  internal static string MakeIdentifierObjects( MainForm MForm, string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -78,8 +54,8 @@ namespace CodeAnalysis
       {
       if( IsInsideID && IsInsideObject )
         {
-        ShowStatus( "This should never happen." );
-        ShowStatus( "IsInsideID && IsInsideObject" );
+        MForm.ShowStatus( "This should never happen." );
+        MForm.ShowStatus( "IsInsideID && IsInsideObject" );
         SBuilder.Append( Char.ToString( Markers.ErrorPoint ));
         return SBuilder.ToString();
         }
@@ -160,7 +136,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsIdentifierCharacter( char ToTest,
+  private static bool IsIdentifierCharacter( char ToTest,
                                       char PreviousChar,
                                       int Where )
     {
