@@ -12,35 +12,11 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class RemoveSlashComments
+  static class RemoveSlashComments
   {
-  private MainForm MForm;
 
 
-
-  private RemoveSlashComments()
-    {
-    }
-
-
-
-  internal RemoveSlashComments( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal string RemoveAllDoubleSlashComments( string InString )
+  internal static string RemoveAllDoubleSlashComments( MainForm MForm, string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
     string[] SplitS = InString.Split( new Char[] { '\n' } );
@@ -48,7 +24,7 @@ namespace CodeAnalysis
     for( int Count = 0; Count < Last; Count++ )
       {
       string Line = SplitS[Count];
-      Line = RemoveDoubleSlashComments( Line );
+      Line = RemoveDoubleSlashComments( MForm, Line );
 
       string StartString =
               Char.ToString( Markers.Begin ) +
@@ -65,7 +41,7 @@ namespace CodeAnalysis
 
 
 
-  private string RemoveDoubleSlashComments( string Line )
+  private static string RemoveDoubleSlashComments( MainForm MForm, string Line )
     {
     // This line with the two slashes in the URL should
     // not be considered to be a comment.
@@ -88,7 +64,7 @@ namespace CodeAnalysis
     string SingleQuoteCharStr = "\'\"\'";
     if( SingleQuoteCharStr.Length != 3 )
       {
-      ShowStatus( "SingleQuoteCharStr.Length != 3" ); 
+      MForm.ShowStatus( "SingleQuoteCharStr.Length != 3" );
       return Char.ToString( Markers.ErrorPoint );
       }
 
