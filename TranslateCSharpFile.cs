@@ -38,172 +38,136 @@ namespace CodeAnalysis
 
 
 
-  internal string TranslateFile( string FileName )
+  internal Token GetTokensFromFile( string FileName )
     {
     if( MForm == null )
-      return "";
+      return null;
 
-    SourceFile SFile = new SourceFile( MForm );
-    string Result = SFile.ReadFromTextFile( FileName );
-    SFile = null; // It should be freed.
-
+    string Result = SourceFile.ReadFromTextFile( MForm, FileName );
     if( Result.Length == 0 )
       {
       ShowStatus( "Nothing in Source File." );
-      return "";
+      return null;
       }
 
-    TestMarkers TMarkers = new TestMarkers( MForm );
-
-    RemoveStarComments RStComments = new
-                        RemoveStarComments( MForm );
-
-    Result = RStComments.RemoveAllComments( Result );
-    RStComments = null;
-
-    // ShowStatus( Result );
-
+    Result = RemoveStarComments.RemoveAllComments( MForm, Result );
     if( Result.Contains( Char.ToString(
                       Markers.ErrorPoint )))
       {
       ShowStatus( " " );
-      ShowStatus( "There was an error marker after RSComments." );
-      return "";
+      ShowStatus( "There was an error marker after RemoveStarComments." );
+      return null;
       }
 
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after RStComments." );
-      return "";
+      return null;
       }
 
 
-    RemoveSlashComments RemoveSlComments = new
-                        RemoveSlashComments( MForm );
-
-    Result = RemoveSlComments.RemoveAllDoubleSlashComments( Result );
-    RemoveSlComments = null;
-
+    Result = RemoveSlashComments.RemoveAllDoubleSlashComments( MForm, Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
-      ShowStatus( "TestBeginEnd returned false after RemoveSlComments." );
-      return "";
+      ShowStatus( "TestBeginEnd returned false after RemoveSlashComments." );
+      return null;
       }
 
-    CSharpToStrings CSToStrings = new
-                              CSharpToStrings( MForm );
-
-    Result = CSToStrings.MakeStringObjects( Result );
-    CSToStrings = null; // It should be freed.
+    Result = CSharpToStrings.MakeStringObjects( MForm, Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
     if( Result.Contains( Char.ToString(
                       Markers.ErrorPoint )))
       {
       ShowStatus( " " );
-      ShowStatus( "There was an error after CSToStrings." );
+      ShowStatus( "There was an error after CSharpToStrings." );
       ShowStatus( " " );
       ShowStatus( Result );
-      return "";
+      return null;
       }
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after CSToStrings." );
-      return "";
+      return null;
       }
 
-    CSharpToCharacters CSToCharacters = new
-                              CSharpToCharacters( MForm );
-
-    Result = CSToCharacters.MakeCharacterObjects( Result );
-    CSToCharacters = null; // It should be freed.
+    Result = CSharpToCharacters.MakeCharacterObjects( Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
     if( Result.Contains( Char.ToString(
                       Markers.ErrorPoint )))
       {
       ShowStatus( " " );
       ShowStatus( "There was an error marker after CSToCharacters." );
-      return "";
+      return null;
       }
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after CSToCharacters." );
-      return "";
+      return null;
       }
 
-    CSharpToIdentifiers CSToIdentifiers = new
-                          CSharpToIdentifiers( MForm );
-
-    Result = CSToIdentifiers.MakeIdentifierObjects( Result );
-    CSToIdentifiers = null;
+    Result = CSharpToIdentifiers.MakeIdentifierObjects( MForm, Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after CSToIdentifiers." );
-      return "";
+      return null;
       }
 
-    CSharpToNumbers CSToNumbers = new
-                              CSharpToNumbers( MForm );
-
-    Result = CSToNumbers.MakeNumberObjects( Result );
-    CSToNumbers = null;
+    Result = CSharpToNumbers.MakeNumberObjects( Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after CSToNumbers." );
-      return "";
+      return null;
       }
 
-    CSharpToOperators CSToOperators = new
-                           CSharpToOperators( MForm );
-    Result = CSToOperators.MakeOperatorObjects( Result );
-    CSToOperators = null;
+    Result = CSharpToOperators.MakeOperatorObjects( Result );
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
-    if( !TMarkers.TestBeginEnd( Result ))
+    if( !TestMarkers.TestBeginEnd( MForm, Result ))
       {
       ShowStatus( " " );
       ShowStatus( "TestBeginEnd returned false after CSToOperators." );
-      return "";
+      return null;
       }
 
-    Result = TMarkers.RemoveOutsideWhiteSpace( Result );
+    Result = TestMarkers.RemoveOutsideWhiteSpace( Result );
 
-    if( !TMarkers.TestBrackets( Result ))
+    if( !TestMarkers.TestBrackets( MForm, Result ))
       {
       // ShowStatus( Result );
-      return "";
+      return null;
       }
 
     IDDictionary IdentDictionary = new
                                IDDictionary( MForm );
 
-    CSharpFixIdentifiers CSFixIDs = new
-                        CSharpFixIdentifiers( MForm,
-                                    IdentDictionary );
+    // CSharpFixIdentifiers CSFixIDs = new
+    //                    CSharpFixIdentifiers( MForm,
+    //                                IdentDictionary );
 
     // if( !CSFixIDs.GetIdentifiers( Result ))
       // {
@@ -211,23 +175,20 @@ namespace CodeAnalysis
       // return "";
       // }
 
-    Result = CSFixIDs.MakeIdentifiersLowerCase( Result );
+    // Result = CSFixIDs.MakeIdentifiersLowerCase( Result );
 
     // IdentDictionary.ShowIDs();
 
-    CSFixIDs = null;
+    // CSFixIDs = null;
     if( !MForm.CheckEvents())
-      return "";
+      return null;
 
 
-    BracketLevel BracketLev = new BracketLevel( MForm );
-    Result = BracketLev.SetLevelChars( Result );
-    BracketLev = null;
-
+    Result = BracketLevel.SetLevelChars( MForm, Result );
     if( Result == "" )
       {
       // ShowStatus( Result );
-      return "";
+      return null;
       }
 
 
@@ -238,14 +199,7 @@ namespace CodeAnalysis
     ShowStatus( " " );
     Tk.ShowTokensAtLevel( 1 );
 
-    // return "";
-
-    // ShowStatus( Result );
-    ShowStatus( " " );
-    ShowStatus( "That's it." );
-    ShowStatus( " " );
-    ShowStatus( " " );
-    return Result;
+    return Tk;
     }
 
 
