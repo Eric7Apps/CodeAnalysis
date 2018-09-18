@@ -23,7 +23,7 @@ namespace CodeAnalysis
 {
   public partial class MainForm : Form
   {
-  internal const string VersionDate = "9/16/2018";
+  internal const string VersionDate = "9/18/2018";
   internal const int VersionNumber = 09; // 0.9
   // private System.Threading.Mutex SingleInstanceMutex = null;
   // private bool IsSingleInstance = false;
@@ -196,7 +196,7 @@ namespace CodeAnalysis
       // Control characters.
     }
 
-      
+
 
   }
 }
