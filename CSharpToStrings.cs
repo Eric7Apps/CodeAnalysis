@@ -11,35 +11,11 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class CSharpToStrings
+  static class CSharpToStrings
   {
-  private MainForm MForm;
 
 
-
-  private CSharpToStrings()
-    {
-    }
-
-
-
-  internal CSharpToStrings( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal string MakeStringObjects( string InString )
+  internal static string MakeStringObjects( MainForm MForm, string InString )
     {
     // In C, a wide character string literal looks
     // like:  L"Hello world!" with the L in front of
@@ -60,7 +36,7 @@ namespace CodeAnalysis
     string SingleQuoteCharStr = "\'\"\'";
     if( SingleQuoteCharStr.Length != 3 )
       {
-      ShowStatus( "SingleQuoteCharStr.Length != 3" );
+      MForm.ShowStatus( "SingleQuoteCharStr.Length != 3" );
       return Char.ToString( Markers.ErrorPoint );
       }
 
