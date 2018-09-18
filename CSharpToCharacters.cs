@@ -12,35 +12,10 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class CSharpToCharacters
+  static class CSharpToCharacters
   {
-  private MainForm MForm;
 
-
-
-  private CSharpToCharacters()
-    {
-    }
-
-
-
-  internal CSharpToCharacters( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-  internal string MakeCharacterObjects( string InString )
+  internal static string MakeCharacterObjects( string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
