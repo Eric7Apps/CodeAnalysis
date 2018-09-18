@@ -23,35 +23,10 @@ using System.Text;
 
 namespace CodeAnalysis
 {
-  class CSharpToOperators
+  static class CSharpToOperators
   {
-  private MainForm MForm;
 
-
-  private CSharpToOperators()
-    {
-    }
-
-
-
-  internal CSharpToOperators( MainForm UseForm )
-    {
-    MForm = UseForm;
-    }
-
-
-
-  private void ShowStatus( string ToShow )
-    {
-    if( MForm != null )
-      MForm.ShowStatus( ToShow );
-
-    }
-
-
-
-
-  internal string MakeOperatorObjects( string InString )
+  internal static string MakeOperatorObjects( string InString )
     {
     StringBuilder SBuilder = new StringBuilder();
 
@@ -108,7 +83,7 @@ namespace CodeAnalysis
 
 
 
-  private bool MarkOperator( StringBuilder SBuilder,
+  private static bool MarkOperator( StringBuilder SBuilder,
                              char PreviousChar,
                              char TestChar,
                              bool IsInsideOp )
@@ -172,7 +147,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsStartCharacter( char TestChar )
+  private static bool IsStartCharacter( char TestChar )
     {
     // Preprocessing is not allowed here.
     if( TestChar == '#' )
@@ -247,7 +222,7 @@ namespace CodeAnalysis
 
 
 
-  private bool IsSecondOperatorCharacter(
+  private static bool IsSecondOperatorCharacter(
                                    char TestChar,
                                    char PreviousChar )
     {
