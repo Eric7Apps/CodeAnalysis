@@ -158,8 +158,6 @@ namespace CodeAnalysis
       // string ToFile = Path.GetFileName( FileName );
       // ToFile = "\\Eric\\TestGcc\\include\\" + ToFile;
 
-      // Compare the bytes in each file if ToFile
-      // exists, and see if they are the same.
       // File.ReadAllBytes()
 
       ShowStatus( FileName );
@@ -167,13 +165,14 @@ namespace CodeAnalysis
       TranslateCSharpFile TranslateCS = new
                        TranslateCSharpFile( MForm );
 
-      string FileS = TranslateCS.TranslateFile( FileName );
-      if( FileS == "" )
+      Token Tk = TranslateCS.GetTokensFromFile( FileName );
+      if( Tk == null )
         {
         ShowStatus( " " );
-        ShowStatus( "TranslateCS returned empty string for: " + FileName );
+        ShowStatus( "TranslateCS returned null token for: " + FileName );
         return false;
         }
+
       // File.Copy( FileName, ToFile, true );
       // ShowStatus( ToFile );
       HeaderF.AddFile( FileName );
